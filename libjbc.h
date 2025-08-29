@@ -26,6 +26,12 @@ typedef struct {
   uint64_t sceProcCap;
 } jbc_cred;
 
+typedef struct {
+
+  jbc_cred original;
+  jbc_cred root;
+} jbc_jail_state;
+
 uintptr_t jbc_get_prison0(void);
 uintptr_t jbc_get_rootvnode(void);
 int jbc_get_cred(jbc_cred *);
@@ -36,11 +42,7 @@ int jbc_set_cred(const jbc_cred *);
 uint64_t jbc_krw_kcall(uint64_t fn, ...);
 uintptr_t jbc_krw_get_td(void);
 
-typedef enum {
-  USERSPACE,
-  KERNEL_HEAP,
-  KERNEL_TEXT
-} KmemKind;
+typedef enum { USERSPACE, KERNEL_HEAP, KERNEL_TEXT } KmemKind;
 
 int jbc_krw_memcpy(uintptr_t dst, uintptr_t src, size_t sz, KmemKind kind);
 // void jbc_krw_kpatch(uint64_t x_fast, uint64_t offset, uint8_t byte);
@@ -57,6 +59,9 @@ enum {
 void jbc_run_as_root(void (*fn)(void *arg), void *arg, int cwd_mode);
 int jbc_mount_in_sandbox(const char *system_path, const char *mnt_name);
 int jbc_unmount_in_sandbox(const char *mnt_name);
+
+int jbc_jailbreak(jbc_jail_state *state);
+int jbc_unjailbreak(jbc_jail_state *state);
 
 #ifdef __cplusplus
 }
